@@ -1,16 +1,16 @@
-package com.example.isweathergoodforawalk_bottomnav.ui.notifications;
+package com.example.isweathergoodforawalk_bottomnav.ui.hourly;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class NotificationsViewModel extends ViewModel {
+public class HourlyViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public NotificationsViewModel() {
+    public HourlyViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is notifications fragment");
+        mText.setValue("This is the hourly fragment");
     }
 
     public LiveData<String> getText() {
