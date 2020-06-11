@@ -37,4 +37,6 @@
     <string name="weather_card_description_default_value">Clear</string>
 
     <string name="progress_bar_fetching_data">Fetching Data...</string>
+    <string name="content_description_weather_icon">Weather Icon</string>
+    <string name="no_rain_chart_text">No Rain For the Next Hour!</string>
 </resources>
