@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">IsWeatherGoodForAWalk_BottomNav</string>
+    <string name="app_name">IsWeatherGoodForAWalk</string>
     <string name="title_home">Home</string>
     <string name="title_hourly">Hourly</string>
     <string name="title_daily">Daily</string>
@@ -27,14 +27,14 @@
     <string name="homefrag_next_rain_value">6 pm (in 30 min)</string>
 
     <string name="weather_card_temperature_title">Temperature / Feels Like:</string>
-    <string name="weather_card_temperature_default_value">0F / 0F</string>
     <string name="weather_card_cloudy_title">% Cloudy:</string>
-    <string name="weather_card_cloudy_default_value">0%</string>
     <string name="weather_card_rain_title">, Rain:</string>
-    <string name="weather_card_rain_default_value">0mm</string>
     <string name="weather_card_good_walk_title">Good Walk?:</string>
+    <string name="weather_card_temperature_default_value">0F / 0F</string>
+    <string name="weather_card_cloudy_default_value">0%</string>
+    <string name="weather_card_rain_default_value">0mm</string>
     <string name="weather_card_good_walk_default_value">Yes</string>
-
     <string name="weather_card_description_default_value">Clear</string>
+
     <string name="progress_bar_fetching_data">Fetching Data...</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.isweathergoodforawalk_bottomnav.ui.daily;
+package io.github.terickson87.isgoodweatherforawalk.ui.daily;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,7 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.isweathergoodforawalk_bottomnav.R;
+import io.github.terickson87.isgoodweatherforawalk.R;
 
 public class DailyFragment extends Fragment {
 

@@ -1,4 +1,4 @@
-package com.example.isweathergoodforawalk_bottomnav;
+package io.github.terickson87.isgoodweatherforawalk;
 
 import org.junit.Test;
 

@@ -1,4 +1,4 @@
-package com.example.isweathergoodforawalk_bottomnav.ui.hourly;
+package io.github.terickson87.isgoodweatherforawalk.ui.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -12,20 +12,20 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.isweathergoodforawalk_bottomnav.R;
+import io.github.terickson87.isgoodweatherforawalk.R;
 
-public class HourlyFragment extends Fragment {
+public class HomeFragment extends Fragment {
 
-    private HourlyViewModel mHourlyViewModel;
+    private HomeViewModel mHomeViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mHourlyViewModel = new ViewModelProvider(this).get(HourlyViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_hourly, container, false);
+        mHomeViewModel = new ViewModelProvider(this).get(HomeViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
 
-        final TextView textView = root.findViewById(R.id.text_dashboard);
+        final TextView textView = root.findViewById(R.id.text_home);
 
-        mHourlyViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+        mHomeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

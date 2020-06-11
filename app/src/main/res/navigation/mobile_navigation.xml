@@ -7,19 +7,19 @@
 
     <fragment
         android:id="@+id/navigation_home"
-        android:name="com.example.isweathergoodforawalk_bottomnav.ui.home.HomeFragment"
+        android:name="io.github.terickson87.isgoodweatherforawalk.ui.home.HomeFragment"
         android:label="@string/title_home"
         tools:layout="@layout/fragment_home" />
 
     <fragment
         android:id="@+id/navigation_hourly"
-        android:name="com.example.isweathergoodforawalk_bottomnav.ui.hourly.HourlyFragment"
+        android:name="io.github.terickson87.isgoodweatherforawalk.ui.hourly.HourlyFragment"
         android:label="@string/title_hourly"
         tools:layout="@layout/fragment_hourly" />
 
     <fragment
         android:id="@+id/navigation_daily"
-        android:name="com.example.isweathergoodforawalk_bottomnav.ui.daily.DailyFragment"
+        android:name="io.github.terickson87.isgoodweatherforawalk.ui.daily.DailyFragment"
         android:label="@string/title_daily"
         tools:layout="@layout/fragment_daily" />
 </navigation>

@@ -1,16 +1,16 @@
-package com.example.isweathergoodforawalk_bottomnav.ui.home;
+package io.github.terickson87.isgoodweatherforawalk.ui.hourly;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class HomeViewModel extends ViewModel {
+public class HourlyViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public HomeViewModel() {
+    public HourlyViewModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is home fragment");
+        mText.setValue("This is the hourly fragment");
     }
 
     public LiveData<String> getText() {

@@ -1,7 +1,8 @@
-package com.example.isweathergoodforawalk_bottomnav;
+package io.github.terickson87.isgoodweatherforawalk;
 
 import android.os.Bundle;
 
+import io.github.terickson87.isgoodweatherforawalk.R;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,8 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
+
+// TODO Make the main activity a pull-to-refresh one
 
 public class MainActivity extends AppCompatActivity {
 

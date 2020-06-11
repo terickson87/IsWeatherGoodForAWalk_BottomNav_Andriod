@@ -1,4 +1,4 @@
-package com.example.isweathergoodforawalk_bottomnav.ui.daily;
+package io.github.terickson87.isgoodweatherforawalk.ui.daily;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
