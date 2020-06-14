@@ -1,10 +1,10 @@
 package io.github.terickson87.isgoodweatherforawalk.models.weather;
 
 public class DailyTempFeelsLike {
-    double mDay;
-    double mNight;
-    double mEvening;
-    double mMorning;
+    private double mDay;
+    private double mNight;
+    private double mEvening;
+    private double mMorning;
 
     public DailyTempFeelsLike() { }
 

@@ -1,8 +1,8 @@
 package io.github.terickson87.isgoodweatherforawalk.models.weather;
 
 public class DailyTemp extends DailyTempFeelsLike {
-    double mMin;
-    double mMax;
+    private double mMin;
+    private double mMax;
 
     public DailyTemp() { }
 
