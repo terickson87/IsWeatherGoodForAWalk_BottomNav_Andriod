@@ -1,4 +1,4 @@
-package io.github.terickson87.isgoodweatherforawalk.models;
+package io.github.terickson87.isgoodweatherforawalk.models.location;
 
 import android.Manifest;
 import android.app.Activity;
@@ -23,22 +23,23 @@ import java.util.Locale;
  * Gets the location from the android.location library and reports it.
  */
 public class GetLocation implements LocationListener {
-    public static final int mc_REQUEST_LOCATION_PERMISSION = 1;
-    public static final int mc_MAX_LOCATION_RESULTS = 1;
+    public static final int mcREQUEST_LOCATION_PERMISSION = 1;
+    public static final int mcMAX_LOCATION_RESULTS = 1;
     public static final String TAG = "GetLocation";
 
-    private Activity m_Activity;
-    private Double m_Latitude;
-    private Double m_Longitude;
-    private String m_CityName;
-    private String m_StateName;
-    private String m_CountryCode;
-    public LocationManager m_LocationManager;
+    private Activity mActivity;
+    private Double mLatitude;
+    private Double mLongitude;
+    private String mCityName;
+    private String mStateName;
+    private String mCountryCode;
+    private LocationCallback mLocationCallback = null;
+    public LocationManager mLocationManager;
 
     // ***** Constructor *****
     public GetLocation(Activity activity) {
-        m_Activity = activity;
-        m_LocationManager = (LocationManager) m_Activity.getSystemService(Context.LOCATION_SERVICE);
+        mActivity = activity;
+        mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
     }
 
     // ***** Main functionality *****
@@ -47,72 +48,85 @@ public class GetLocation implements LocationListener {
     }
 
     private boolean isCoarseLocationPermission() {
-        return ActivityCompat.checkSelfPermission(m_Activity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     private boolean isFineLocationPermission() {
-        return ActivityCompat.checkSelfPermission(m_Activity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
     }
 
     public boolean isLocationPermissions() {
         return  isCoarseLocationPermission() && isFineLocationPermission();
     }
 
-    public void getPermissions(boolean getLocation) {
+    public void getPermissions(boolean isGetLocation, LocationCallback locationCallback) {
+        if (locationCallback != null) {
+            mLocationCallback = locationCallback;
+        }
+
         if (!isCoarseLocationPermission() || !isFineLocationPermission()) {
             Log.i(TAG, " - GetPermissions: Location Permissions Not Yet Granted.");
-            ActivityCompat.requestPermissions(m_Activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, mc_REQUEST_LOCATION_PERMISSION);
+            ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, mcREQUEST_LOCATION_PERMISSION);
         } else {
             Log.i(TAG, " - GetPermissions: Location Permissions Granted.");
-            if (getLocation) {
+            if (isGetLocation) {
                 getAndHandleGoodLocation();
             }
         }
     }
 
+    public void getPermissions(boolean isGetLocation) {
+        getPermissions(isGetLocation, null);
+    }
+
     private void getAndHandleGoodLocation() {
         // This check must be local to prevent lint errors
-        if (ActivityCompat.checkSelfPermission(m_Activity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(m_Activity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED
+                && ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             getPermissions(true);
             return;
         }
 
-        Location location = m_LocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = mLocationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
 
         if (location != null) {
             Log.i(TAG, "getAndHandleGoodLocation - Non Null Location");
             handleGoodLocation(location);
+
         } else {
             Log.i(TAG, "getAndHandleGoodLocation - Null Location");
             Criteria criteria = new Criteria();
-            String bestProvider = String.valueOf(m_LocationManager.getBestProvider(criteria, true)).toString();
-            m_LocationManager.requestLocationUpdates(bestProvider, 1000, 0, this);
+            String bestProvider = String.valueOf(mLocationManager.getBestProvider(criteria, true)).toString();
+            mLocationManager.requestLocationUpdates(bestProvider, 1000, 0, this);
         }
     }
 
     private void handleGoodLocation(Location location) {
-        m_Latitude = location.getLatitude();
-        m_Longitude = location.getLongitude();
-        Log.i(TAG, " handleGoodLocation() - " + "lat: " + m_Latitude + ", long: " + m_Longitude);
-        Address address = getAddress(m_Activity, m_Latitude, m_Longitude);
-        m_CityName = getCityName(address);
-        Log.i(TAG, "City Name: " + m_CityName);
-        m_StateName = getStateName(address);
-        Log.i(TAG, "State Name: " + m_StateName);
-        m_CountryCode = getCountryCode(address);
-        Log.i(TAG, "Country Code: " + m_CountryCode);
+        mLatitude = location.getLatitude();
+        mLongitude = location.getLongitude();
+        Log.i(TAG, " handleGoodLocation() - " + "lat: " + mLatitude + ", long: " + mLongitude);
+        Address address = getAddress(mActivity, mLatitude, mLongitude);
+        mCityName = getCityName(address);
+        Log.i(TAG, "City Name: " + mCityName);
+        mStateName = getStateName(address);
+        Log.i(TAG, "State Name: " + mStateName);
+        mCountryCode = getCountryCode(address);
+        Log.i(TAG, "Country Code: " + mCountryCode);
+
+        if (mLocationCallback != null) {
+            mLocationCallback.onSuccess(mLatitude, mLongitude);
+        }
     }
 
     // ***** Utility Methods *****
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == mc_REQUEST_LOCATION_PERMISSION) {
+        if (requestCode == mcREQUEST_LOCATION_PERMISSION) {
             if(grantResults.length==1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.i(TAG, "onRequestPermissionsResult: Permission granted");
                 getAndHandleGoodLocation();
             }
         } else {
-            Log.i(TAG, "onRequestPermissionsResult(): requestCode (" + requestCode + ") not equal to " + mc_REQUEST_LOCATION_PERMISSION);
+            Log.i(TAG, "onRequestPermissionsResult(): requestCode (" + requestCode + ") not equal to " + mcREQUEST_LOCATION_PERMISSION);
         }
     }
 
@@ -120,7 +134,7 @@ public class GetLocation implements LocationListener {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         List<Address> addresses = null;
         try {
-            addresses = geocoder.getFromLocation(latitude, longitude, mc_MAX_LOCATION_RESULTS);
+            addresses = geocoder.getFromLocation(latitude, longitude, mcMAX_LOCATION_RESULTS);
             return addresses.get(0);
         } catch (IOException e) {
             Log.e(TAG, "Error getting Address: " + e.getMessage());
@@ -143,40 +157,40 @@ public class GetLocation implements LocationListener {
 
     // ***** Setters *****
     public void setLatitude(Double latitude) {
-        this.m_Latitude = latitude;
+        this.mLatitude = latitude;
     }
 
     public void setLongitude(Double longitude) {
-        this.m_Longitude = longitude;
+        this.mLongitude = longitude;
     }
 
     public void setCityName(String cityName) {
-        this.m_CityName = cityName;
+        this.mCityName = cityName;
     }
 
     public void setStateName(String stateName) {
-        this.m_StateName = stateName;
+        this.mStateName = stateName;
     }
 
     // ***** Getters *****
     public Double getLatitude() {
-        return m_Latitude;
+        return mLatitude;
     }
 
     public Double getLongitude() {
-        return m_Longitude;
+        return mLongitude;
     }
 
     public String getCityName() {
-        return m_CityName;
+        return mCityName;
     }
 
     public String getStateName() {
-        return m_StateName;
+        return mStateName;
     }
 
     public String getCountryCode() {
-        return m_CountryCode;
+        return mCountryCode;
     }
 
     /**
@@ -189,7 +203,7 @@ public class GetLocation implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         // remove location callback:
-        m_LocationManager.removeUpdates(this);
+        mLocationManager.removeUpdates(this);
 
         // Handle good location
         Log.i(TAG, "onLocationChange(): Location Received");

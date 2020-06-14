@@ -1,4 +1,4 @@
-package io.github.terickson87.isgoodweatherforawalk.models;
+package io.github.terickson87.isgoodweatherforawalk.models.weather;
 
 import org.json.JSONObject;
 
