@@ -3,6 +3,8 @@ package io.github.terickson87.isgoodweatherforawalk.models.weather;
 import android.content.Context;
 import android.util.Log;
 
+import androidx.lifecycle.MutableLiveData;
+
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -68,6 +70,7 @@ public class OpenWeatherApi {
     private List<MinutelyWeatherData> mMinutelyWeatherData;
     private List<HourlyWeatherData> mHourlyWeatherData;
     private List<DailyWeatherData> mDailyWeatherData;
+    private WeatherData mWeatherData;
 
     // Getters
     public CurrentWeatherData getCurrentWeatherData() {
@@ -84,6 +87,10 @@ public class OpenWeatherApi {
 
     public List<DailyWeatherData> getDailyWeatherData() {
         return mDailyWeatherData;
+    }
+
+    public WeatherData getWeatherData() {
+        return mWeatherData;
     }
 
     public String getTimezoneString() {
@@ -176,6 +183,14 @@ public class OpenWeatherApi {
         parseMinutely();
         parseHourly();
         parseDaily();
+        createWeatherData();
+    }
+
+    public MutableLiveData<WeatherData> getWeatherDataLiveData() {
+        MutableLiveData<WeatherData> weatherDataLiveData = new MutableLiveData<>();
+
+
+        return  weatherDataLiveData;
     }
 
     private WeatherField parseWeatherFieldJson(JSONObject parentObjOfWeatherJsonArr) {
@@ -212,27 +227,27 @@ public class OpenWeatherApi {
             e.printStackTrace();
         }
 
-        // Set optional fields separately
+        // Set optional fields separately to avoid JSONException triggering the catch statement
         double windGust = 0.0;
         try {
             windGust += mCurrentJson.getDouble("wind_gust");
         } catch (JSONException ignored) {}
-        mCurrentWeatherData.mWindGust = windGust;
+        mCurrentWeatherData.setWindGust(windGust);
 
         double precipitationVolume = 0.0;
         try {
             JSONObject rain = mCurrentJson.getJSONObject("rain");
             precipitationVolume += rain.getDouble("1hr");
         } catch (JSONException ignored) {}
-        mCurrentWeatherData.mPrecipitationVolume = precipitationVolume;
+        mCurrentWeatherData.setPrecipitationVolume(precipitationVolume);
 
         double snowVolume = 0.0;
         try {
             JSONObject snow = mCurrentJson.getJSONObject("snow");
             snowVolume += snow.getDouble("1hr");
         } catch (JSONException ignored) {}
-        mCurrentWeatherData.mPrecipitationVolume += snowVolume;
-        mCurrentWeatherData.mSnowVolume = snowVolume;
+        mCurrentWeatherData.setPrecipitationVolume(mCurrentWeatherData.getPrecipitationVolume() + snowVolume);
+        mCurrentWeatherData.setSnowVolume(snowVolume);
     }
 
     private void parseMinutely() {
@@ -243,8 +258,8 @@ public class OpenWeatherApi {
                 JSONObject minuteJson = mMinutelyJson.getJSONObject(iMinute);
                 MinutelyWeatherData minutelyWeatherData = new MinutelyWeatherData();
 
-                minutelyWeatherData.mTime = Instant.ofEpochSecond(minuteJson.getLong("dt"));
-                minutelyWeatherData.mPrecipitationVolume = minuteJson.getDouble("precipitation");
+                minutelyWeatherData.setTime(Instant.ofEpochSecond(minuteJson.getLong("dt")));
+                minutelyWeatherData.setPrecipitationVolume(minuteJson.getDouble("precipitation"));
 
                 mMinutelyWeatherData.add(minutelyWeatherData);
             }
@@ -263,33 +278,34 @@ public class OpenWeatherApi {
                 JSONObject hourJson = mHourlyJson.getJSONObject(iHour);
                 HourlyWeatherData hourlyWeatherData = new HourlyWeatherData();
 
-                hourlyWeatherData.mTime = Instant.ofEpochSecond(hourJson.getLong("dt"));
-                hourlyWeatherData.mTemperature = hourJson.getDouble("temp");
-                hourlyWeatherData.mTemperatureFeelsLike = hourJson.getDouble("feels_like");
-                hourlyWeatherData.mPercentCloudy = hourJson.getInt("clouds");
-                hourlyWeatherData.mWindSpeed = hourJson.getDouble("wind_speed");
-                hourlyWeatherData.mWeatherField = parseWeatherFieldJson(hourJson);
+                hourlyWeatherData.setTime(Instant.ofEpochSecond(hourJson.getLong("dt")));
+                hourlyWeatherData.setTemperature(hourJson.getDouble("temp"));
+                hourlyWeatherData.setTemperatureFeelsLike(hourJson.getDouble("feels_like"));
+                hourlyWeatherData.setPercentCloudy(hourJson.getInt("clouds"));
+                hourlyWeatherData.setWindSpeed(hourJson.getDouble("wind_speed"));
+                hourlyWeatherData.setWeatherField(parseWeatherFieldJson(hourJson));
 
+                // Set optional fields separately to avoid JSONException triggering the catch statement
                 double windGust = 0.0;
                 try {
                     windGust += hourJson.getDouble("wind_gust");
                 } catch (JSONException ignored) {}
-                hourlyWeatherData.mWindGust = windGust;
+                hourlyWeatherData.setWindGust(windGust);
 
                 double precipitationVolume = 0.0;
                 try {
                     JSONObject rain = hourJson.getJSONObject("rain");
                     precipitationVolume += rain.getDouble("1hr");
                 } catch (JSONException ignored) {}
-                hourlyWeatherData.mPrecipitationVolume = precipitationVolume;
+                hourlyWeatherData.setPrecipitationVolume(precipitationVolume);
 
                 double snowVolume = 0.0;
                 try {
                     JSONObject snow = hourJson.getJSONObject("snow");
                     snowVolume += snow.getDouble("1hr");
                 } catch (JSONException ignored) {}
-                hourlyWeatherData.mPrecipitationVolume += snowVolume;
-                hourlyWeatherData.mSnowVolume = snowVolume;
+                hourlyWeatherData.setPrecipitationVolume(hourlyWeatherData.getPrecipitationVolume() + snowVolume);
+                hourlyWeatherData.setSnowVolume(snowVolume);
 
                 mHourlyWeatherData.add(hourlyWeatherData);
             }
@@ -305,38 +321,37 @@ public class OpenWeatherApi {
             DailyWeatherData dailyWeatherData = new DailyWeatherData();
             try {
                 JSONObject dayJson = mDailyJson.getJSONObject(iDay);
-                dailyWeatherData.mTime = Instant.ofEpochSecond(dayJson.getLong("dt"));
-                dailyWeatherData.mSunriseTime = Instant.ofEpochSecond(dayJson.getLong("sunrise"));
-                dailyWeatherData.mSunsetTime = Instant.ofEpochSecond(dayJson.getLong("sunset"));
-                dailyWeatherData.mDailyTemp = parseDailyTemp(dayJson);
-                dailyWeatherData.mDailyTempFeelsLike = parseDailyTempFeelsLike(dayJson);
-                dailyWeatherData.mWindSpeed = dayJson.getDouble("wind_speed");
-                dailyWeatherData.mWeatherField = parseWeatherFieldJson(dayJson);
-                dailyWeatherData.mPercentCloudy = dayJson.getInt("clouds");
+                dailyWeatherData.setTime(Instant.ofEpochSecond(dayJson.getLong("dt")));
+                dailyWeatherData.setSunriseTime(Instant.ofEpochSecond(dayJson.getLong("sunrise")));
+                dailyWeatherData.setSunriseTime(Instant.ofEpochSecond(dayJson.getLong("sunset")));
+                dailyWeatherData.setDailyTemp(parseDailyTemp(dayJson));
+                dailyWeatherData.setDailyTempFeelsLike(parseDailyTempFeelsLike(dayJson));
+                dailyWeatherData.setWindSpeed(dayJson.getDouble("wind_speed"));
+                dailyWeatherData.setWeatherField(parseWeatherFieldJson(dayJson));
+                dailyWeatherData.setPercentCloudy(dayJson.getInt("clouds"));
 
                 double windGust = 0.0;
                 try {
                     windGust += dayJson.getDouble("wind_gust");
                 } catch (JSONException ignored) {}
-                dailyWeatherData.mWindGust = windGust;
+                dailyWeatherData.setWindGust(windGust);
 
                 double precipitationVolume = 0.0;
                 try {
                     precipitationVolume = dayJson.getDouble("rain");
                 } catch(JSONException ignored) {}
-                dailyWeatherData.mPrecipitationVolume = precipitationVolume;
+                dailyWeatherData.setPrecipitationVolume(precipitationVolume);
 
                 double snowVolume = 0.0;
                 try {
                     snowVolume = dayJson.getDouble("snow");
                 } catch(JSONException ignored) {}
-                dailyWeatherData.mPrecipitationVolume += snowVolume;
-                dailyWeatherData.mSnowVolume = snowVolume;
+                dailyWeatherData.setPrecipitationVolume(dailyWeatherData.getPrecipitationVolume() + snowVolume);
+                dailyWeatherData.setSnowVolume(snowVolume);
 
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
 
             mDailyWeatherData.add(dailyWeatherData);
             }
@@ -347,12 +362,13 @@ public class OpenWeatherApi {
         DailyTemp dailyTemp = new DailyTemp();
         try {
             JSONObject dailyTempJsonObj = parentObjOfDailyTempJsonObj.getJSONObject("temp");
-            dailyTemp.mDay = dailyTempJsonObj.getDouble("day");
-            dailyTemp.mNight = dailyTempJsonObj.getDouble("night");
-            dailyTemp.mEvening = dailyTempJsonObj.getDouble("eve");
-            dailyTemp.mMorning = dailyTempJsonObj.getDouble("morn");
-            dailyTemp.mMax = dailyTempJsonObj.getDouble("min");
-            dailyTemp.mMin = dailyTempJsonObj.getDouble("max");
+            dailyTemp.setDay(dailyTempJsonObj.getDouble("day"));
+            dailyTemp.setNight(dailyTempJsonObj.getDouble("night"));
+            dailyTemp.setEvening(dailyTempJsonObj.getDouble("eve"));
+            dailyTemp.setMorning(dailyTempJsonObj.getDouble("morn"));
+            dailyTemp.setMax(dailyTempJsonObj.getDouble("min"));
+            dailyTemp.setMin(dailyTempJsonObj.getDouble("max"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -363,14 +379,24 @@ public class OpenWeatherApi {
         DailyTempFeelsLike dailyTempFeelsLike = new DailyTempFeelsLike();
         try {
             JSONObject dailyTempFeelsLikeJsonObj = parentObjOfDailyTempFeelsLikeJsonObj.getJSONObject("feels_like");
-            dailyTempFeelsLike.mDay = dailyTempFeelsLikeJsonObj.getDouble("day");
-            dailyTempFeelsLike.mNight = dailyTempFeelsLikeJsonObj.getDouble("night");
-            dailyTempFeelsLike.mEvening = dailyTempFeelsLikeJsonObj.getDouble("eve");
-            dailyTempFeelsLike.mMorning = dailyTempFeelsLikeJsonObj.getDouble("morn");
+            dailyTempFeelsLike.setDay(dailyTempFeelsLikeJsonObj.getDouble("day"));
+            dailyTempFeelsLike.setNight(dailyTempFeelsLikeJsonObj.getDouble("night"));
+            dailyTempFeelsLike.setEvening(dailyTempFeelsLikeJsonObj.getDouble("eve"));
+            dailyTempFeelsLike.setMorning(dailyTempFeelsLikeJsonObj.getDouble("morn"));
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return dailyTempFeelsLike;
+    }
+
+    private void createWeatherData() {
+        mWeatherData = new WeatherData();
+        mWeatherData.setCurrentWeatherData(mCurrentWeatherData);
+        mWeatherData.setMinutelyWeatherData(mMinutelyWeatherData);
+        mWeatherData.setHourlyWeatherData(mHourlyWeatherData);
+        mWeatherData.setDailyWeatherData(mDailyWeatherData);
+
     }
 
     private Date unixSecondsToDate(long unixSeconds) {
@@ -394,8 +420,8 @@ public class OpenWeatherApi {
 
     private Instant getNextRainTimeMinute() {
         for (MinutelyWeatherData minutelyWeatherData : mMinutelyWeatherData) {
-            if (minutelyWeatherData.mPrecipitationVolume > 0) {
-                return minutelyWeatherData.mTime;
+            if (minutelyWeatherData.getPrecipitationVolume() > 0) {
+                return minutelyWeatherData.getTime();
             }
         }
         return null;
@@ -403,8 +429,8 @@ public class OpenWeatherApi {
 
     private Instant getNextRainTimeHour() {
         for (HourlyWeatherData hourlyWeatherData : mHourlyWeatherData) {
-            if (hourlyWeatherData.mPrecipitationVolume > 0) {
-                return hourlyWeatherData.mTime;
+            if (hourlyWeatherData.getPrecipitationVolume() > 0) {
+                return hourlyWeatherData.getTime();
             }
         }
         return null;
@@ -412,8 +438,8 @@ public class OpenWeatherApi {
 
     private Instant getNextRainTimeDay() {
         for (DailyWeatherData dailyWeatherData : mDailyWeatherData) {
-            if (dailyWeatherData.mPrecipitationVolume > 0) {
-                return dailyWeatherData.mTime;
+            if (dailyWeatherData.getPrecipitationVolume() > 0) {
+                return dailyWeatherData.getTime();
             }
         }
         return null;

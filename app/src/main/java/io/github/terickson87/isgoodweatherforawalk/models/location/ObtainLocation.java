@@ -22,9 +22,9 @@ import java.util.Locale;
 /**
  * Gets the location from the android.location library and reports it.
  */
-public class GetLocation implements LocationListener {
-    public static final int mcREQUEST_LOCATION_PERMISSION = 1;
-    public static final int mcMAX_LOCATION_RESULTS = 1;
+public class ObtainLocation implements LocationListener {
+    public static final int mc_REQUEST_LOCATION_PERMISSION = 1;
+    public static final int mc_MAX_LOCATION_RESULTS = 1;
     public static final String TAG = "GetLocation";
 
     private Activity mActivity;
@@ -37,13 +37,23 @@ public class GetLocation implements LocationListener {
     public LocationManager mLocationManager;
 
     // ***** Constructor *****
-    public GetLocation(Activity activity) {
+    public ObtainLocation(Activity activity) {
         mActivity = activity;
         mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
     }
 
+    public ObtainLocation(Activity activity, LocationCallback locationCallback) {
+        mActivity = activity;
+        mLocationManager = (LocationManager) mActivity.getSystemService(Context.LOCATION_SERVICE);
+        mLocationCallback = locationCallback;
+    }
+
     // ***** Main functionality *****
-    public void getLocation() {
+    public void retrieveLocation(LocationCallback locationCallback) {
+        getPermissions(true, locationCallback);
+    }
+
+    public void retrieveLocation() {
         getPermissions(true);
     }
 
@@ -66,7 +76,7 @@ public class GetLocation implements LocationListener {
 
         if (!isCoarseLocationPermission() || !isFineLocationPermission()) {
             Log.i(TAG, " - GetPermissions: Location Permissions Not Yet Granted.");
-            ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, mcREQUEST_LOCATION_PERMISSION);
+            ActivityCompat.requestPermissions(mActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, mc_REQUEST_LOCATION_PERMISSION);
         } else {
             Log.i(TAG, " - GetPermissions: Location Permissions Granted.");
             if (isGetLocation) {
@@ -120,13 +130,13 @@ public class GetLocation implements LocationListener {
 
     // ***** Utility Methods *****
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == mcREQUEST_LOCATION_PERMISSION) {
+        if (requestCode == mc_REQUEST_LOCATION_PERMISSION) {
             if(grantResults.length==1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.i(TAG, "onRequestPermissionsResult: Permission granted");
                 getAndHandleGoodLocation();
             }
         } else {
-            Log.i(TAG, "onRequestPermissionsResult(): requestCode (" + requestCode + ") not equal to " + mcREQUEST_LOCATION_PERMISSION);
+            Log.i(TAG, "onRequestPermissionsResult(): requestCode (" + requestCode + ") not equal to " + mc_REQUEST_LOCATION_PERMISSION);
         }
     }
 
@@ -134,7 +144,7 @@ public class GetLocation implements LocationListener {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         List<Address> addresses = null;
         try {
-            addresses = geocoder.getFromLocation(latitude, longitude, mcMAX_LOCATION_RESULTS);
+            addresses = geocoder.getFromLocation(latitude, longitude, mc_MAX_LOCATION_RESULTS);
             return addresses.get(0);
         } catch (IOException e) {
             Log.e(TAG, "Error getting Address: " + e.getMessage());
