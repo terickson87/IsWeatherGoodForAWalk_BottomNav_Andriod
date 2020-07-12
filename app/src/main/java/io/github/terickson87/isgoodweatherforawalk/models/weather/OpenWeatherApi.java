@@ -37,7 +37,7 @@ public class OpenWeatherApi {
     private static final String sfTAG = "OpenWeatherApi";
 
     // Api Props
-    private static final String msfAPI_KEY =  "***REMOVED***";
+    private static final String msfAPI_KEY =  "";
     private static final String msfONE_CALL_API_URL = "https://api.openweathermap.org/data/2.5/onecall?";
     private static final String msfTAG_API = "appid=";
     private static final String msfTAG_LATITUDE = "lat=";
