@@ -22,6 +22,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+import io.github.terickson87.isgoodweatherforawalk.R;
+
 /**
  * OpenWeatherApi get the weather data from a location from the openweathermap.org onecall API.
  *
@@ -37,7 +39,6 @@ public class OpenWeatherApi {
     private static final String sfTAG = "OpenWeatherApi";
 
     // Api Props
-    private static final String msfAPI_KEY =  "";
     private static final String msfONE_CALL_API_URL = "https://api.openweathermap.org/data/2.5/onecall?";
     private static final String msfTAG_API = "appid=";
     private static final String msfTAG_LATITUDE = "lat=";
@@ -153,7 +154,8 @@ public class OpenWeatherApi {
         addParamToUrl(msfTAG_LATITUDE + mLatitude.toString());
         addParamToUrl(msfTAG_LONGITUDE + mLongitude.toString());
         addParamToUrl(msfTAG_UNITS + msfUNITS_IMPERIAL);
-        addParamToUrl(msfTAG_API + msfAPI_KEY);
+        String API_KEY = mContext.getString(R.string.OPEN_WEATHER_API_KEY);
+        addParamToUrl(msfTAG_API + API_KEY);
         Log.i(sfTAG, " - callApi Called. ApiUrl = \"" + mApiUrl + "\"");
 
         // Build request
